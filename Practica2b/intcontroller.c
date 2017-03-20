@@ -38,14 +38,19 @@ int ic_conf_irq(enum enable st, enum int_vec vec)
 
 	if (vec == VEC)
 		//COMPLETAR: poner la linea IRQ en modo vectorizado
+		conf &= ~0x4; //1011
 
 	else
 		//COMPLETAR: poner la linea IRQ en modo no vectorizado
+		conf |= 0x4;  //0100
 
 	if (st == ENABLE)
 		//COMPLETAR: habilitar la linea IRQ
+		conf &= ~0x2; //1101
+		
 	else
 		//COMPLETAR: deshabilitar la linea IRQ
+		conf |= 0x2;  //0010
 
 	rINTCON = conf;
 	return 0;
@@ -57,8 +62,10 @@ int ic_conf_fiq(enum enable st)
 
 	if (st == ENABLE)
 		//COMPLETAR: habilitar la linea FIQ
+		rINTCON &= ~0x1; //1110
 	else if (st == DISABLE)
 		//COMPLETAR: deshabilitar la linea FIQ
+		rINTCON |= 0x1; //1110
 	else
 		ret = -1;
 
@@ -67,7 +74,7 @@ int ic_conf_fiq(enum enable st)
 
 int ic_conf_line(enum int_line line, enum int_mode mode)
 {
-	unsigned int bit = INT_BIT(line);
+	unsigned int bit = INT_BIT(line); //Esto no lo estoy usando (?)
 
 	if (line < 0 || line > 26)
 		return -1;
@@ -77,8 +84,10 @@ int ic_conf_line(enum int_line line, enum int_mode mode)
 
 	if (mode == IRQ)
 		//COMPLETAR: poner la linea line en modo IRQ
+		rINTMOD &= ~0x1 << line;
 	else
 		//COMPLETAR: poner la linea line en modo FIQ
+		rINTMOD |= 0x1 << line;
 
 	return 0;
 }
@@ -89,6 +98,7 @@ int ic_enable(enum int_line line)
 		return -1;
 
 	//COMPLETAR: habilitar las interrupciones por la linea line
+	rINTMSK &= ~0x1<<line;
 
 	return 0;
 }
@@ -99,7 +109,8 @@ int ic_disable(enum int_line line)
 		return -1;
 
 	//COMPLETAR: enmascarar las interrupciones por la linea line
-	
+	rINTMSK |= 0x1<<line;	
+
 	return 0;
 }
 
