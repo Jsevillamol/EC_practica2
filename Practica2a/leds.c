@@ -36,6 +36,8 @@ void leds_init( void )
 {
 	//COMPLETAR usando el interfaz del puerto B definido en gpio.h
 	// hay que configurar los pines 9 y 10 como pines de salida
+	portB_conf(BIT_LED1, OUTPUT);
+	portB_conf(BIT_LED2, OUTPUT);
 
 	leds_display( status );
 }
@@ -89,15 +91,19 @@ void leds_display( unsigned int leds_status )
 	if( status & LED1 )
 		//COMPLETAR usando el interfaz del puerto B definido en gpio.h
 		//hay que poner a nivel bajo el bit correspondiente al led 1
+		portB_write(BIT_LED1, LOW);
 	else
 		//COMPLETAR usando el interfaz del puerto B definido en gpio.h
 		//hay que poner a nivel alto el bit correspondiente al led 1
+		portB_write(BIT_LED1, HIGH);
 
 	// LED 2
 	if( status & LED2 )
 		//COMPLETAR usando el interfaz del puerto B definido en gpio.h
 		//hay que poner a nivel bajo el bit correspondiente al led 2
+		portB_write(BIT_LED2, LOW);
 	else
 		//COMPLETAR usando el interfaz del puerto B definido en gpio.h
 		//hay que poner a nivel alto el bit correspondiente al led 2
+		portB_write(BIT_LED2, HIGH);
 }

@@ -35,6 +35,8 @@ static unsigned int status = 0;
 void leds_init( void )
 {
 	//COMPLETAR: tomar la implementación de la primera parte
+	portB_conf(BIT_LED1, OUTPUT);
+	portB_conf(BIT_LED2, OUTPUT);
 
 	leds_display( status );
 }
@@ -87,8 +89,14 @@ void leds_display( unsigned int leds_status )
 	// LED 1
 	if( status & LED1 )
 		//COMPLETAR: tomar la implementación de la primera parte
+		portB_write(BIT_LED1, LOW);
+	else
+		portB_write(BIT_LED1, HIGH);
 
 	// LED 2
 	if( status & LED2 )
 		//COMPLETAR: tomar la implementación de la primera parte
+		portB_write(BIT_LED2, LOW);
+	else
+		portB_write(BIT_LED2, HIGH);
 }

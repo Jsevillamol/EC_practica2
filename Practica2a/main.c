@@ -36,6 +36,11 @@ int setup(void)
 	
 	/*******************************************/
 
+	portG_conf(6, INPUT);
+	portG_conf(7, INPUT);
+	portG_conf_pup(6, ENABLE);
+	portG_conf_pup(7, ENABLE);
+
 	Delay(0);
 	return 0;
 }
@@ -49,6 +54,8 @@ int loop(void)
 		// hay que conmutar el led1
 		// También hay que comutar la dirección del movimiento del led rotante
 		// representado por el campo direction de la variable RL
+		led1_switch();
+		RL.direction = (RL.direction == 1) ?0 : 1;
 	}
 
 	if (buttons & BUT2) {
@@ -58,6 +65,14 @@ int loop(void)
 		// representado por el campo moving de la variable RL, y en caso de
 		// ponerlo en marcha debemos reiniciar el campo iter al valor del campo
 		// speed.
+		led2_switch();
+		if (RL.moving == 0){
+			RL.iter = RL.speed;
+			RL.moving = 1;
+		}
+		else{
+			RL.moving = 0;
+		}
 	}
 
 	if (RL.moving) {
@@ -69,7 +84,12 @@ int loop(void)
 			// Recordar que queremos un movimiento circular, representado por
 			// las 6 primeras posiciones en el array Segmentes del display de 8
 			// segmentos, por lo que position debe estar siempre entre 0 y 5.
-			
+			if (RL.direction == 0)
+				RL.position =  (RL.position + 1) % 6;
+			else
+				RL.position =  (RL.position - 1) % 6;
+			D8Led_segment(RL.position);
+			RL.iter = RL.speed;
 		}
 	}
 

@@ -11,8 +11,10 @@ int portB_conf(int pin, enum port_mode mode)
 
 	if (mode == SIGOUT)
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPCONB |= (1<<pin);
 	else if (mode == OUTPUT)
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPCONB &= ~(1<<pin);
 	else
 		ret = -1;
 
@@ -29,8 +31,10 @@ int portB_write(int pin, enum digital val)
 
 	if (val)
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPDATB |= (1<<pin);
 	else
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPDATB &= ~(1<<pin);
 
 	return 0;
 }
@@ -47,15 +51,29 @@ int portG_conf(int pin, enum port_mode mode)
 	switch (mode) {
 		case INPUT:
 			// COMPLETAR: tomar la implementación de la primera parte
+			rPCONG ^= ~(1<<2*pin+1);
+			rPCONG ^= ~(1<<2*pin);
+			//rPCONG &= ~(0x3<<pos);
 			break;
 		case OUTPUT:
 			// COMPLETAR: tomar la implementación de la primera parte
+			rPCONG ^= ~(1<<2*pin+1);
+			rPCONG |= (1<<2*pin);
+			//rPCONG |= (1<<pos);
+			//rPCONG &= ~(1<<(pos+1));
 			break;
 		case SIGOUT:
 			// COMPLETAR: tomar la implementación de la primera parte
+			rPCONG |= (1<<2*pin+1);
+			rPCONG ^= ~(1<<2*pin);
+			//rPCONG |= (1<<(pos+1));
+			//rPCONG &= ~(1<<pos);
 			break;
 		case EINT:
 			// COMPLETAR: tomar la implementación de la primera parte
+			rPCONG |= (1<<2*pin+1);
+			rPCONG |= (1<<2*pin);
+			//rPCONG |= (0x3<<pos);
 			break;
 		default:
 			return -1;
@@ -75,25 +93,35 @@ int portG_eint_trig(int pin, enum trigger trig)
 		case LLOW:
 			// COMPLETAR: poner en rEXTINT a partir de la posición pos tres bits
 			// a 000, para configurar interrupciones externas por nivel bajo
+			rEXTINT &= ~(0x7<<pos);
 			break;
 		case LHIGH:
 			// COMPLETAR: poner en rEXTINT a partir de la posición pos tres bits
 			// a 001, para configurar interrupciones externas por nivel alto
+			rEXTINT &= ~(0x3<<(pos + 1));
+			rEXTINT |= (0x1<<pos);
 			break;
 		case FALLING:
 			// COMPLETAR: poner en rEXTINT a partir de la posición pos tres bits
 			// a 010, para configurar interrupciones externas por flanco de
 			// bajada
+			rEXTINT &= ~(0x1<<(pos + 2));
+			rEXTINT |= (0x1<<(pos + 1));
+			rEXTINT &= ~(0x1<<pos);
 			break;
 		case RISING:
 			// COMPLETAR: poner en rEXTINT a partir de la posición pos tres bits
 			// a 100, para configurar interrupciones externas por flanco de
 			// subida
+			rEXTINT |= (0x1<<(pos + 2));
+			rEXTINT &= ~(0x3<<pos);
 			break;
 		case EDGE:
 			// COMPLETAR: poner en rEXTINT a partir de la posición pos tres bits
 			// a 110, para configurar interrupciones externas por cualquier
 			// flanco
+			rEXTINT |= (0x3<<(pos + 1));
+			rEXTINT &= ~(0x1<<pos);
 			break;
 		default:
 			return -1;
@@ -116,8 +144,10 @@ int portG_write(int pin, enum digital val)
 
 	if (val)
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPDATG |= (1<<pin);
 	else
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPDATG &= ~(1<<pin);
 
 	return 0;
 }
@@ -134,8 +164,10 @@ int portG_read(int pin, enum digital* val)
 
 	if (rPDATG & (0x1 << pin))
 		// COMPLETAR: tomar la implementación de la primera parte
+		*val = HIGH;
 	else
 		// COMPLETAR: tomar la implementación de la primera parte
+		*val = LOW;
 
 	return 0;
 }
@@ -150,8 +182,10 @@ int portG_conf_pup(int pin, enum enable st)
 
 	if (st == ENABLE)
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPUPG &= ~(1<<pin);
 	else
 		// COMPLETAR: tomar la implementación de la primera parte
+		rPUPG |= (1<<pin);
 
 	return 0;
 }

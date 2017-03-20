@@ -58,6 +58,15 @@ void irq_ISR(void)
 	//el interfaz definido en intcontroller.h. Si es la de EINT4567 se invocará
 	//la función button_ISR y se borrará el flag correspondiente utilizando el
 	//mismo interfaz.
+
+	if (bit & (1<<13)){
+		timer_ISR();
+		ic_cleanflag(INT_TIMER0);
+	} else if (bit & (1<<21)){
+		button_ISR();
+		ic_cleanflag(INT_EINT4567);
+	}
+
 }
 
 int setup(void)
@@ -73,6 +82,13 @@ int setup(void)
 	//externas por flanco de bajada por ellos y activar las correspondientes
 	//resistencias de pull-up.
 
+	portG_conf(6, EINT);
+	portG_eint_trig(6, FALLING);
+	portG_conf_pup(6, ENABLE);
+	portG_conf(7, EINT);
+	portG_eint_trig(7, FALLING);
+	portG_conf_pup(7, ENABLE);
+
 	/********************************************************************/
 
 	/* Configuración del timer */
@@ -86,13 +102,23 @@ int setup(void)
 	//      poner el contador en modo RELOAD
 	//      dejar el contador parado
 
+	tmr_set_prescaler(0, 255);
+	tmr_set_divider(0, 2);
+	tmr_set_count(TIMER0, 62500, 1);
+	tmr_update(TIMER0);
+	tmr_set_mode(TIMER0, RELOAD);
+	tmr_stop(TIMER0);
+
 	if (RL.moving)
 		tmr_start(TIMER0);
+
 	/***************************/
 
 	// Registramos la ISR
-	pISR_IRQ = //COMPLETAR: registrar irq_ISR como rutina de tratamiento de
-		       //interrupción para la linea IRQ
+	pISR_IRQ = irq_ISR;
+
+	//COMPLETAR: registrar irq_ISR como rutina de tratamiento de
+	//interrupción para la linea IRQ
 
 	/* Configuración del controlador de interrupciones
 	 * Habilitamos la línea IRQ, en modo no vectorizado
@@ -111,6 +137,13 @@ int setup(void)
 	//		configurar la línea INT_EINT4567 en modo IRQ
 	//		habilitar la línea INT_TIMER0
 	//		habilitar la línea INT_EINT4567
+
+	ic_conf_irq(ENABLE, NOVEC);
+	ic_conf_fiq(DISABLE);
+	ic_conf_line(INT_TIMER0, IRQ);
+	ic_conf_line(INT_EINT4567, IRQ);
+	ic_enable(INT_TIMER0);
+	ic_enable(INT_EINT4567);
 
 	/***************************************************/
 

@@ -72,10 +72,12 @@ void D8Led_segment(int value)
 {
 	if( (value >= 0) && (value < 8) )
 		//COMPLETAR: Tomar la implementación de la primera parte
+		LED8ADDR = ~Segments[value];
 }
 
 void D8Led_digit(int value)
 {
 	if( (value >= 0) && (value < 16) )
 		//COMPLETAR: Tomar la implementación de la primera parte
+		LED8ADDR = ~Digits[value];
 }
