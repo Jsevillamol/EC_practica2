@@ -41,7 +41,6 @@ void timer_ISR(void)
 		else
 			RL.position =  (RL.position - 1) % 6;
 		D8Led_segment(RL.position);
-		RL.iter = RL.speed;
 	}
 }
 
@@ -83,9 +82,9 @@ void button_ISR(void)
 	// eliminamos rebotes
 	Delay(2000);
 	// borramos el flag en extintpnd
-	rEXTINTPND = //COMPLETAR: debemos borrar las peticiones de interrupción en
-		         //EXTINTPND escribiendo un 1 en los flags que queremos borrar (los
-				 //correspondientes a los pulsadores pulsados)
+	rEXTINTPND |= 0x3; //COMPLETAR: debemos borrar las peticiones de interrupción en
+		               //EXTINTPND escribiendo un 1 en los flags que queremos borrar (los
+				       //correspondientes a los pulsadores pulsados)
 }
 
 void irq_ISR(void)
