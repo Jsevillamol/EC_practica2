@@ -84,7 +84,7 @@ int ic_conf_line(enum int_line line, enum int_mode mode)
 
 	if (mode == IRQ)
 		//COMPLETAR: poner la linea line en modo IRQ
-		rINTMOD &= ~0x1 << line;
+		rINTMOD &= ~(0x1 << line);
 	else
 		//COMPLETAR: poner la linea line en modo FIQ
 		rINTMOD |= 0x1 << line;
@@ -98,7 +98,8 @@ int ic_enable(enum int_line line)
 		return -1;
 
 	//COMPLETAR: habilitar las interrupciones por la linea line
-	rINTMSK &= ~0x1<<line;
+	rINTMSK &= ~(0x1<<line);
+	rINTMSK &= ~(0x1<<26); //quitar mascara general
 
 	return 0;
 }
