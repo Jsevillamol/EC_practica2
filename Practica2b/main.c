@@ -29,7 +29,20 @@ void timer_ISR(void)
 	//COMPLETAR: tomar el código de avance de posición del led rotante de la
 	//primera parte
 
-	D8Led_segment(RL.position);
+	if (RL.moving) {
+		// COMPLETAR: debemos hacer avanzar el led rotante una posición en
+		// la dirección indicada por el campo direction de la variable RL.
+		// La posición actual está representada en el campo position.
+		// Recordar que queremos un movimiento circular, representado por
+		// las 6 primeras posiciones en el array Segmentes del display de 8
+		// segmentos, por lo que position debe estar siempre entre 0 y 5.
+		if (RL.direction == 0)
+			RL.position =  (RL.position + 1) % 6;
+		else
+			RL.position =  (RL.position - 1) % 6;
+		D8Led_segment(RL.position);
+		RL.iter = RL.speed;
+	}
 }
 
 void button_ISR(void)
@@ -39,6 +52,33 @@ void button_ISR(void)
 
 	//COMPLETAR: usar el código de la primera parte parte de atención a los
 	//pulsadores
+
+	//unsigned int buttons = read_button();
+
+	if (buttons & BUT1) {
+		// COMPLETAR: utilizando la interfaz para los leds definida en leds.h
+		// hay que conmutar el led1
+		// También hay que conmutar la dirección del movimiento del led rotante
+		// representado por el campo direction de la variable RL
+		led1_switch();
+		RL.direction = (RL.direction == 1) ?0 : 1;
+	}
+
+	if (buttons & BUT2) {
+		// COMPLETAR: utilizando la interfaz para los leds definida en leds.h
+		// hay que conmutar el led2
+		// También hay que conmutar el estado de movimiento del led rotante
+		// representado por el campo moving de la variable RL, y en caso de
+		// ponerlo en marcha debemos reiniciar el campo iter al valor del campo
+		// speed.
+		led2_switch();
+		if (RL.moving == 0){
+			RL.moving = 1;
+		}
+		else{
+			RL.moving = 0;
+		}
+	}
 
 	// eliminamos rebotes
 	Delay(2000);
