@@ -56,15 +56,15 @@ int portG_conf(int pin, enum port_mode mode)
 		case INPUT:
 			// COMPLETAR: poner en rPCONG 00 a partir de la posiciÃ³n pos para
 			// configurar como pin de entrada el pin indicado por el parÃ¡metro pin
-			rPCONG ^= ~(1<<2*pin+1);
-			rPCONG ^= ~(1<<2*pin);
+			rPCONG ^= ~(1<<(pos+1));
+			rPCONG ^= ~(1<<pos);
 			//rPCONG &= ~(0x3<<pos);
 			break;
 		case OUTPUT:
 			// COMPLETAR: poner en rPCONG 01 a partir de la posiciÃ³n pos para
 			// configurar como pin de salida el pin indicado por el parÃ¡metro pin
-			rPCONG ^= ~(1<<2*pin+1);
-			rPCONG |= (1<<2*pin);
+			rPCONG ^= ~(1<<(pos+1));
+			rPCONG |= (1<<pos);
 			//rPCONG |= (1<<pos);
 			//rPCONG &= ~(1<<(pos+1));
 			break;
@@ -72,8 +72,8 @@ int portG_conf(int pin, enum port_mode mode)
 			// COMPLETAR: poner en rPCONG 10 a partir de la posiciÃ³n pos para
 			// que salga la seÃ±al interna correspondiente por el pin indicado
 			// por el parÃ¡metro pin
-			rPCONG |= (1<<2*pin+1);
-			rPCONG ^= ~(1<<2*pin);
+			rPCONG |= (1<<(pos+1));
+			rPCONG ^= ~(1<< pos);
 			//rPCONG |= (1<<(pos+1));
 			//rPCONG &= ~(1<<pos);
 			break;
@@ -81,8 +81,8 @@ int portG_conf(int pin, enum port_mode mode)
 			// COMPLETAR: poner en rPCONG 11 a partir de la posiciÃ³n pos para
 			// habilitar la generaciÃ³n de interrupciones externas por el pin
 			// indicado por el parÃ¡metro pin
-			rPCONG |= (1<<2*pin+1);
-			rPCONG |= (1<<2*pin);
+			rPCONG |= (1<<(pos+1));
+			rPCONG |= (1<<pos);
 			//rPCONG |= (0x3<<pos);
 			break;
 		default:
