@@ -39,7 +39,7 @@ void timer_ISR(void)
 		if (RL.direction == 0)
 			RL.position =  (RL.position + 1) % 6;
 		else
-			RL.position =  (RL.position - 1) % 6;
+			RL.position =  (RL.position==0) ? 5 : (RL.position - 1);
 		D8Led_segment(RL.position);
 	}
 }
