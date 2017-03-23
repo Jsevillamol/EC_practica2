@@ -127,9 +127,11 @@ int ic_cleanflag(enum int_line line)
 	if (rINTMOD & bit)
 		//COMPLETAR: borrar el flag de interrupcion correspondiente a la linea line
 		//con la linea configurada por FIQ
+		rF_ISPC |= 0x1 << line;
 	else
 		//COMPLETAR: borrar el flag de interrupcion correspondiente a la linea line
 		//con la linea configurada por IRQ
+		rI_ISPC |= 0x1 << line;
 	return 0;
 }
 
