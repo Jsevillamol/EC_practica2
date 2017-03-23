@@ -73,6 +73,7 @@ void button_ISR(void)
 		led2_switch();
 		if (RL.moving == 0){
 			RL.moving = 1;
+			tmr_start(TIMER0);
 		}
 		else{
 			RL.moving = 0;
