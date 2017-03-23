@@ -74,7 +74,7 @@ int ic_conf_fiq(enum enable st)
 
 int ic_conf_line(enum int_line line, enum int_mode mode)
 {
-	unsigned int bit = INT_BIT(line); //Esto no lo estoy usando (?)
+	unsigned int bit = INT_BIT(line);
 
 	if (line < 0 || line > 26)
 		return -1;
@@ -84,10 +84,10 @@ int ic_conf_line(enum int_line line, enum int_mode mode)
 
 	if (mode == IRQ)
 		//COMPLETAR: poner la linea line en modo IRQ
-		rINTMOD &= ~(0x1 << line);
+		rINTMOD &= ~bit;
 	else
 		//COMPLETAR: poner la linea line en modo FIQ
-		rINTMOD |= 0x1 << line;
+		rINTMOD |= bit;
 
 	return 0;
 }

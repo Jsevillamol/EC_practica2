@@ -9,7 +9,7 @@
 
 int tmr_set_prescaler(int p, int  value)
 {
-	int offset = p*8;
+	int offset = (p/2)*8;
 	value &= 0xFF;
 
 	if (p < 0 || p > 5)
