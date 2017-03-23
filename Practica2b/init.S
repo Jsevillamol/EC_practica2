@@ -20,7 +20,7 @@
     .extern button_ISR
 	.extern ic_cleanflag
 	.global start
-	//.global irq_ISR
+	.global irq_ISR
 
 	/*
 	** Modos de operaci�n
@@ -53,9 +53,9 @@
 	.equ rEXTINTPND, 0x1d20054
 
 	//anadimos un alias del registo I_ISPR
-	.equ rI_ISPR, 0x1e00038
-	.equ thirteen, 0x1000;
-	.equ twentyone, 0x100000;
+	.equ rI_ISPR, 0x1e00020
+	.equ thirteen, 0x2000;
+	.equ twentyone, 0x200000;
 
 start:
 
@@ -167,26 +167,27 @@ irq_ISR:
 	add fp, sp, #(4*13-4)
 
 	//Cuerpo
-	ldr r0, =rI_ISPR;
-	mov r1, #1;
-	and r2, r0, #thirteen;
-	cmp r2, #thirteen;
-	beq timer;
+	ldr r1, =rI_ISPR
+	ldr r0, [r1]
 
-	and r2, r0, #twentyone;
-	cmp r2, #twentyone;
-	beq button;
+	and r2, r0, #thirteen
+	cmp r2, #thirteen
+	beq timer
 
-	b else;
+	and r2, r0, #twentyone
+	cmp r2, #twentyone
+	beq button
+
+	b else
 
 timer:
-	bl timer_ISR;
-	mov r0, #13;
-	bl ic_cleanflag;
+	bl timer_ISR
+	mov r0, #13
+	bl ic_cleanflag
 button:
-	bl button_ISR;
-	mov r0, #21;
-	bl ic_cleanflag;
+	bl button_ISR
+	mov r0, #21
+	bl ic_cleanflag
 else:
 
 	//Epilogo

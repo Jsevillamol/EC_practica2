@@ -88,9 +88,9 @@ void button_ISR(void)
 				       //correspondientes a los pulsadores pulsados)
 }
 
-//extern void irq_ISR(void);
+extern void irq_ISR(void);
 
-void irq_ISR(void)
+/*void irq_ISR(void)
 {
 	int bit = rI_ISPR;
 
@@ -109,7 +109,7 @@ void irq_ISR(void)
 		ic_cleanflag(INT_EINT4567);
 	}
 
-}
+}*/
 
 
 int setup(void)
