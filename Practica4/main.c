@@ -25,6 +25,8 @@
 **      cada una ocupa 0x9600B y se indican en el fichero load_img.text
 */
 
+int nImg = 0;
+
 void timer0_isr( void ) __attribute__ ((interrupt ("IRQ")));
 
 void putImageNoDMA( unsigned int imgDir )
@@ -43,11 +45,22 @@ void putImageNoDMA( unsigned int imgDir )
 void timer0_isr( void )
 {
 	// COMPLETAR:
+	unsigned int whicheint = rEXTINTPND;
+	unsigned int buttons = (whicheint >> 2) & 0x3;
 
+	int imgDir = 0x0c400000 + nImg*0x10000B;
 
+	if (buttons & BUT2) {
+		//transferencia sin DMA
+		putImageNoDMA(imgDir);
+	} else {
+		//transferencia DMA
+		putImageDMA(imgDir);
+	}
 
+	nImg = (nImg + 1) % 36;
 
-
+	ic_cleanflag(INT_TIMER0);
 }
 
 
