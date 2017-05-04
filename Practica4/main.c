@@ -67,32 +67,54 @@ void timer0_isr( void )
 int setup(void)
 {
 	// Inicializa el sistema, la UART0, el LCD y el DMA
-    sys_init();
-    uart0_init();
-    lcd_init();
-    zdma0_init();
+	sys_init();
+	uart0_init();
+	lcd_init();
+	zdma0_init();
 
-    // COMPLETAR:
-    //Configurar los puertos de la GPIO que sean necesarios
+	// COMPLETAR:
+	//Configurar los puertos de la GPIO que sean necesarios
+	rPDATA = ~0;
+	rPCONA = 0xFE;
+	rPDATB = ~0;
+	rPCONB = 0x14F;
+	rPDATC = ~0;
+	rPCONC = 0x5FF555FF;
+	rPUPC = 0x94FB;
+	rPDATD = ~0;
+	rPCOND = 0xAAAA;
+	rPUPD = 0xFF;
+	rPDATE = ~0;
+	rPCONE = 0x255A9;
+	rPUPE = 0x1FB;
+	rPDATF = ~0;
+	rPCONF = 0x251A;
+	rPUPF = 0x74;
+	rPDATG = ~0;
+	rPCONG = 0xF5FF;
+	rPUPG = 0x30;
+	rSPUCR = 0x7;
+	rEXTINT = 0x22000220;
 
+	// Configurar el controlador de interrupciones para que genere interrupciones vectorizadas por la línea IRQ para el timer0
+	ic_init();
+	ic_conf_irq(ENABLE, VEC);
+	ic_conf_fiq(DISABLE);
 
+	ic_conf_line(INT_TIMER0, IRQ);
+	ic_enable(INT_TIMER0);
+	ic_cleanflag(INT_TIMER0);
 
+	// Configurar el timer0 para que genere interrupciones cada 0,1 segundos, es decir 10 interrupciones por segundo
+	tmr_set_prescaler(TIMER0, 49);
+	tmr_set_count(TIMER0, 15625, 1);
+	tmr_set_divider(TIMER0, D1_32);
+	tmr_update(TIMER0);
+	tmr_set_mode(TIMER0, RELOAD);
+	tmr_stop(TIMER0);
 
-
-
-    // Configurar el controlador de interrupciones para que genere interrupciones vectorizadas por la línea IRQ para el timer0
-
-
-
-
-    // Configurar el timer0 para que genere interrupciones cada 0,1segundos
-
-
-
-
-    //Registrar la ISR
-
-
+	//Registrar la ISR
+	pISR_TIMER0 = timer0_isr;
 
 	return 0;
 }
