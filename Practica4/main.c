@@ -17,15 +17,13 @@
 #include "gpio.h"
 #include "button.h"
 
-/* Notas de diseño:
-**    - El buffer de memoria del LCD esta en 0x0c200000 (es programable) y es de tamaño 0x9600B
+/* Notas de diseÃ±o:
+**    - El buffer de memoria del LCD esta en 0x0c200000 (es programable) y es de tamaÃ±o 0x9600B
 **    - El LCD tiene una resolucion de 320x240px y en memoria cada byte contiene 2pixeles
-**    - Las 36 imagenes a visualizar consecutivamente en el LCD están
-**      ubicadas a partir de la dirección 0x0c400000 cada 0x10000B,
+**    - Las 36 imagenes a visualizar consecutivamente en el LCD estÃ¡n
+**      ubicadas a partir de la direcciÃ³n 0x0c400000 cada 0x10000 Bytes,
 **      cada una ocupa 0x9600B y se indican en el fichero load_img.text
 */
-
-int nImg = 0;
 
 void timer0_isr( void ) __attribute__ ((interrupt ("IRQ")));
 
@@ -41,25 +39,16 @@ void putImageNoDMA( unsigned int imgDir )
 		dst[i] = src[i];
 }
 
-
-void timer0_isr( void )
-{
+int nImg = 0;
+void timer0_isr( void ) {
 	// COMPLETAR:
-	unsigned int whicheint = rEXTINTPND;
-	unsigned int buttons = (whicheint >> 2) & 0x3;
-
-	int imgDir = 0x0c400000 + nImg*0x10000B;
-
-	if (buttons & BUT2) {
-		//transferencia sin DMA
-		putImageNoDMA(imgDir);
+	int dest = 0x0c400000 + nImg*0x10000;
+	if (read_button() & 1) {
+		putImageNoDMA(dest);
 	} else {
-		//transferencia DMA
-		putImageDMA(imgDir);
+		putImageDMA(dest);
 	}
-
-	nImg = (nImg + 1) % 36;
-
+	nImg = (nImg + 1) % 36
 	ic_cleanflag(INT_TIMER0);
 }
 
@@ -67,70 +56,51 @@ void timer0_isr( void )
 int setup(void)
 {
 	// Inicializa el sistema, la UART0, el LCD y el DMA
-	sys_init();
-	uart0_init();
-	lcd_init();
-	zdma0_init();
+    sys_init();
+    uart0_init();
+    lcd_init();
+    zdma0_init();
 
-	// COMPLETAR:
-	//Configurar los puertos de la GPIO que sean necesarios
-	rPDATA = ~0;
-	rPCONA = 0xFE;
-	rPDATB = ~0;
-	rPCONB = 0x14F;
-	rPDATC = ~0;
-	rPCONC = 0x5FF555FF;
-	rPUPC = 0x94FB;
-	rPDATD = ~0;
-	rPCOND = 0xAAAA;
-	rPUPD = 0xFF;
-	rPDATE = ~0;
-	rPCONE = 0x255A9;
-	rPUPE = 0x1FB;
-	rPDATF = ~0;
-	rPCONF = 0x251A;
-	rPUPF = 0x74;
-	rPDATG = ~0;
-	rPCONG = 0xF5FF;
-	rPUPG = 0x30;
-	rSPUCR = 0x7;
-	rEXTINT = 0x22000220;
+    // COMPLETAR:
+    //Configurar los puertos de la GPIO que sean necesarios
+    portG_conf(6, INPUT);
+	portG_eint_trig(6, FALLING);
+	portG_conf_pup(6, ENABLE);
 
-	// Configurar el controlador de interrupciones para que genere interrupciones vectorizadas por la línea IRQ para el timer0
-	ic_init();
+
+    // Configurar el controlador de interrupciones para que genere interrupciones vectorizadas por la lÃ­nea IRQ para el timer0
 	ic_conf_irq(ENABLE, VEC);
 	ic_conf_fiq(DISABLE);
-
 	ic_conf_line(INT_TIMER0, IRQ);
 	ic_enable(INT_TIMER0);
-	ic_cleanflag(INT_TIMER0);
 
-	// Configurar el timer0 para que genere interrupciones cada 0,1 segundos, es decir 10 interrupciones por segundo
-	tmr_set_prescaler(TIMER0, 49);
-	tmr_set_count(TIMER0, 15625, 1);
-	tmr_set_divider(TIMER0, D1_32);
+
+    // Configurar el timer0 para que genere interrupciones cada 0,1segundos
+	tmr_set_prescaler(TIMER0, 255);
+	tmr_set_divider(TIMER0, D1_8);
+	tmr_set_count(TIMER0, 6250, 6249);
 	tmr_update(TIMER0);
 	tmr_set_mode(TIMER0, RELOAD);
 	tmr_stop(TIMER0);
 
-	//Registrar la ISR
+	tmr_start(TIMER0);
+
+    //Registrar la ISR
 	pISR_TIMER0 = timer0_isr;
+
 
 	return 0;
 }
 
 
 
-void main( void )
-{
+void main( void ){
 unsigned int num = 0;
 
 setup();
  
-while( 1 )
-    {
+while( 1 ) {
 	uart0_putint( num++ );
 	uart0_putchar( '\n' );
     }
-
 }
