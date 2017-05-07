@@ -43,12 +43,12 @@ int nImg = 0;
 void timer0_isr( void ) {
 	// COMPLETAR:
 	int dest = 0x0c400000 + nImg*0x10000;
-	if (read_button() & 1) {
+	if (read_button() & 0b1) {
 		putImageNoDMA(dest);
 	} else {
 		putImageDMA(dest);
 	}
-	nImg = (nImg + 1) % 36
+	nImg = (nImg + 1) % 36;
 	ic_cleanflag(INT_TIMER0);
 }
 
@@ -63,10 +63,18 @@ int setup(void)
 
     // COMPLETAR:
     //Configurar los puertos de la GPIO que sean necesarios
+    //Boton: puerto G
     portG_conf(6, INPUT);
 	portG_eint_trig(6, FALLING);
 	portG_conf_pup(6, ENABLE);
-
+	//LCD: puerto D
+	rPDATD   = ~0;
+	rPCOND 	= 0xAAAA;
+	rPUPD 	= 0xFF;
+	//UART: puerto E
+	rPDATE   = ~0;
+	rPCONE 	= 0x255A9;
+	rPUPE 	= 0x1FB;
 
     // Configurar el controlador de interrupciones para que genere interrupciones vectorizadas por la línea IRQ para el timer0
 	ic_conf_irq(ENABLE, VEC);
@@ -74,11 +82,10 @@ int setup(void)
 	ic_conf_line(INT_TIMER0, IRQ);
 	ic_enable(INT_TIMER0);
 
-
     // Configurar el timer0 para que genere interrupciones cada 0,1segundos
 	tmr_set_prescaler(TIMER0, 255);
 	tmr_set_divider(TIMER0, D1_8);
-	tmr_set_count(TIMER0, 6250, 6249);
+	tmr_set_count(TIMER0, 6250, 1);
 	tmr_update(TIMER0);
 	tmr_set_mode(TIMER0, RELOAD);
 	tmr_stop(TIMER0);
@@ -91,7 +98,6 @@ int setup(void)
 
 	return 0;
 }
-
 
 
 void main( void ){
